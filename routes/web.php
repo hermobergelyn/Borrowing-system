@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,11 +23,25 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Users
+| Onboarding (Role Selection -> Complete Profile)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
+    Route::get('/select-role', [OnboardingController::class, 'selectRole'])->name('role.select');
+    Route::post('/select-role', [OnboardingController::class, 'storeRole'])->name('role.store');
+
+    Route::get('/complete-profile', [OnboardingController::class, 'completeProfile'])->name('profile.complete');
+    Route::post('/complete-profile', [OnboardingController::class, 'storeProfile'])->name('profile.complete.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Users (With Role)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'has.role'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +96,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/borrowings/{borrowing}/request-return', [BorrowingController::class, 'requestReturn'])
         ->name('borrowings.request-return');
-
 
     /*
     |--------------------------------------------------------------------------

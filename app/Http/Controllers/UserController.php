@@ -23,7 +23,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => [
                 'required',
                 'string',
@@ -53,14 +53,36 @@ class UserController extends Controller
                     'admin',
                 ]),
             ],
-        ]);
+            'gender' => ['required', Rule::in(['male', 'female'])],
+            'phone' => ['required', 'string', 'max:30'],
+        ];
 
-        User::create([
+        if ($request->input('role') === 'student') {
+            $rules['course_section'] = ['required', 'string', 'max:80'];
+        } elseif ($request->input('role') === 'staff') {
+            $rules['department'] = ['required', 'string', 'max:120'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
+            'gender' => $validated['gender'],
+            'phone' => $validated['phone'],
+            'course_section' => $validated['course_section'] ?? null,
+            'department' => $validated['department'] ?? null,
         ]);
+
+        $identifierField = $validated['role'] === 'student' ? 'student_id' : 'employee_id';
+        $identifierPrefix = $validated['role'] === 'student' ? 'STU' : 'EMP';
+
+        $user->forceFill([
+            $identifierField => sprintf('%s-%06d', $identifierPrefix, $user->getKey()),
+            'profile_completed_at' => now(),
+        ])->save();
 
         return redirect()
             ->route('admin.users.index')
@@ -74,7 +96,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => [
                 'required',
                 'string',
@@ -89,25 +111,50 @@ class UserController extends Controller
                 Rule::unique('users', 'email')
                     ->ignore($user->id),
             ],
-
-            // Tinanggal na ang 'role' validation dito dahil hindi na ito binabago sa edit form
-
+            'gender' => ['required', Rule::in(['male', 'female'])],
+            'phone' => ['required', 'string', 'max:30'],
             'password' => [
                 'nullable',
                 'string',
                 'min:8',
                 'confirmed',
             ],
-        ]);
+        ];
+
+        $role = strtolower(trim($user->role));
+
+        if ($role === 'student') {
+            $rules['course_section'] = ['required', 'string', 'max:80'];
+        } elseif (in_array($role, ['staff', 'pe_instructor', 'pe instructor'], true)) {
+            $rules['department'] = ['required', 'string', 'max:120'];
+        }
+
+        $validated = $request->validate($rules);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        // Hindi na natin ginalaw ang $user->role para manatili ito sa dati nitong kategorya
+        $user->gender = $validated['gender'];
+        $user->phone = $validated['phone'];
 
-        if (!empty($validated['password'])) {
+        if ($role === 'student') {
+            $user->course_section = $validated['course_section'];
+        } elseif (in_array($role, ['staff', 'pe_instructor', 'pe instructor'], true)) {
+            $user->department = $validated['department'];
+        }
+
+        if (! empty($validated['password'])) {
             $user->password = Hash::make(
                 $validated['password']
             );
+        }
+
+        $identifierField = $role === 'student' ? 'student_id' : 'employee_id';
+        $identifierPrefix = $role === 'student' ? 'STU' : 'EMP';
+
+        if (blank($user->{$identifierField})) {
+            $user->forceFill([
+                $identifierField => sprintf('%s-%06d', $identifierPrefix, $user->getKey()),
+            ]);
         }
 
         $user->save();

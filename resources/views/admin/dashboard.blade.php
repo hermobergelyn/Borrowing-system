@@ -1,130 +1,245 @@
 <x-app-layout>
+    @php
+        $hour = (int) now()->format('G');
+        if ($hour < 12) {
+            $greeting = 'Good morning';
+        } elseif ($hour < 18) {
+            $greeting = 'Good afternoon';
+        } else {
+            $greeting = 'Good evening';
+        }
 
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-slate-800 leading-tight flex items-center gap-3">
-                <span class="p-2 bg-indigo-600 text-white rounded-xl shadow-md">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                </span>
-                {{ __('Equipment Borrowing & Logbook System') }}
-            </h2>
-            <span class="text-xs font-semibold uppercase tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
-                Sports & Inventory Portal
-            </span>
-        </div>
-    </x-slot>
+        $currentDate = now()->format('l, F j');
+        $userName = Auth::user()->name ?? 'Bergelyn';
+    @endphp
 
-    <div class="py-10 bg-slate-50 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="min-h-screen bg-gradient-to-b from-purple-50/70 via-white to-white px-4 py-7 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-6xl space-y-5">
 
-            <!-- ===================================================== -->
-            <!-- WELCOME & QUICK ACTIONS SECTION -->
-            <!-- ===================================================== -->
-            <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 rounded-2xl shadow-xl overflow-hidden text-white">
-                <div class="p-8 relative">
-                    <div class="absolute right-6 -bottom-6 opacity-10 pointer-events-none">
-                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                        </svg>
-                    </div>
-                    
-                    <div class="relative z-10">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <span class="bg-indigo-500/30 text-indigo-200 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-sm border border-indigo-400/20">
-                                    Active Session
-                                </span>
-                                <h1 class="text-3xl font-extrabold mt-2 tracking-tight">
-                                    Welcome back, Admin! 🏆
-                                </h1>
-                                <p class="text-indigo-200 mt-1 text-sm md:text-base">
-                                    You are logged in as <strong class="text-white underline decoration-indigo-400 underline-offset-4">Sports Coordinator</strong>. Monitor equipment inventory, logs, and facility conditions below.
-                                </p>
-                            </div>
-
-                            <div class="flex flex-wrap items-center gap-3 pt-2 md:pt-0">
-                                <a href="{{ route('admin.users.index') }}" class="bg-white text-indigo-900 font-semibold px-5 py-2.5 rounded-xl shadow hover:bg-indigo-50 transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                    </svg>
-                                    Manage Users
-                                </a>
-                                <a href="{{ route('borrowings.index') }}" class="bg-indigo-600/60 hover:bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-xl border border-indigo-400/30 backdrop-blur-sm transition text-sm flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                    </svg>
-                                    View Equipment Logbook
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+            <!-- 1. Top Header Row (Matching Date, Greeting, Subtitle & Right Action Button) -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-xs font-bold text-purple-600 tracking-wide">
+                        {{ $currentDate }}
+                    </p>
+                    <h1 class="mt-0.5 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                        {{ $greeting }}, <span class="text-purple-700">{{ $userName }}</span>
+                    </h1>
+                    <p class="mt-1 text-xs sm:text-sm text-slate-500">
+                        Your sports gear, borrowing logs, returns, and facility updates in one place.
+                    </p>
                 </div>
+
+                <a href="{{ route('equipment.index') }}"
+                   class="inline-flex w-fit items-center gap-2 rounded-xl border border-purple-200 bg-white px-4 py-2.5 text-xs sm:text-sm font-bold text-purple-900 shadow-2xs transition hover:border-purple-300 hover:bg-purple-50">
+                    <svg class="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
+                    </svg>
+                    <span>Browse sports gear</span>
+                </a>
             </div>
 
-            <!-- ===================================================== -->
-            <!-- WEATHER DASHBOARD (Server-side via Laravel HTTP Client) -->
-            <!-- ===================================================== -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6">
+            <!-- 2. Main White Card with 4-Step Flow & Primary CTA (Matching Top Banner Card) -->
+            <section class="rounded-2xl border border-purple-200/80 bg-white p-6 shadow-2xs">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="flex items-start gap-4">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
 
-                    <!-- HEADER -->
-                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-sky-50 text-sky-600 rounded-lg">🌤️</div>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-800">Outdoor Sports Facility & Weather Status</h3>
-                                <p class="text-xs text-slate-500">Real-time condition for outdoor equipment usage and training schedules.</p>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+                                Sports equipment logbook overview
+                            </h2>
+                            <p class="mt-0.5 text-xs sm:text-sm text-slate-500 max-w-2xl">
+                                Add sports gear you need and submit borrowing requests. Once approved, active logs and returns are tracked right here.
+                            </p>
+
+                            <!-- 4 Step Items (Matching 1, 2, 3, 4 Grid in Reference) -->
+                            <div class="mt-4 grid grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                                <a href="{{ route('equipment.index') }}" class="flex items-center gap-2.5 text-xs text-slate-600 hover:text-purple-700 transition">
+                                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-100 text-[11px] font-bold text-purple-700">1</span>
+                                    <span>Browse available sports gear</span>
+                                </a>
+                                <a href="{{ route('equipment.create') }}" class="flex items-center gap-2.5 text-xs text-slate-600 hover:text-purple-700 transition">
+                                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-100 text-[11px] font-bold text-purple-700">2</span>
+                                    <span>Add or update equipment stock</span>
+                                </a>
+                                <a href="{{ route('admin.borrowings.index') }}" class="flex items-center gap-2.5 text-xs text-slate-600 hover:text-purple-700 transition">
+                                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-100 text-[11px] font-bold text-purple-700">3</span>
+                                    <span>Review & approve borrowing logs</span>
+                                </a>
+                                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-2.5 text-xs text-slate-600 hover:text-purple-700 transition">
+                                    <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-100 text-[11px] font-bold text-purple-700">4</span>
+                                    <span>Manage student & staff accounts</span>
+                                </a>
                             </div>
                         </div>
-                        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2 rounded-lg transition">
-                            Refresh
-                        </a>
                     </div>
 
-                    @if(isset($errorMessage))
-                        <!-- ERROR FALLBACK MESSAGE -->
-                        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-rose-800">
-                            <p class="text-sm font-bold flex items-center gap-2">
-                                Weather Information Unavailable
-                            </p>
-                            <p class="text-xs text-rose-600 mt-1">{{ $errorMessage }}</p>
-                        </div>
-                    @elseif(isset($weatherData))
-                        <!-- WEATHER DATA DISPLAY -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                            <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80">
-                                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Location</div>
-                                <div class="text-base font-bold text-slate-800 mt-1 uppercase truncate">{{ $weatherData['city'] }}</div>
-                            </div>
-                            <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80">
-                                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Temperature</div>
-                                <div class="text-xl font-extrabold text-slate-800 mt-1">{{ $weatherData['temperature'] }} <span class="text-sm font-semibold text-slate-500">°C</span></div>
-                            </div>
-                            <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80">
-                                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Condition</div>
-                                <div class="text-base font-bold text-slate-800 mt-1 capitalize truncate">{{ $weatherData['description'] }}</div>
-                            </div>
-                            <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80">
-                                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Humidity</div>
-                                <div class="text-xl font-extrabold text-slate-800 mt-1">{{ $weatherData['humidity'] }} <span class="text-sm font-semibold text-slate-500">%</span></div>
-                            </div>
-                            <div class="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80">
-                                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Wind Speed</div>
-                                <div class="text-xl font-extrabold text-slate-800 mt-1">{{ $weatherData['wind_speed'] }} <span class="text-xs font-semibold text-slate-500">km/h</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                            <span>Synced via Laravel HTTP Client</span>
-                            <span>Status: <strong class="text-emerald-600 font-medium">Connected</strong></span>
-                        </div>
-                    @endif
-
+                    <div class="shrink-0">
+                        <a href="{{ route('admin.borrowings.index') }}"
+                           class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-xs sm:text-sm font-bold text-white shadow-sm transition hover:bg-purple-700">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
+                            </svg>
+                            <span>Open logbook</span>
+                        </a>
+                    </div>
                 </div>
+            </section>
+
+            <!-- 3. Tinted Light Purple Strip Banner (Matching Second Banner Strip) -->
+            <section class="rounded-2xl border border-purple-200/80 bg-purple-100/65 px-6 py-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex items-start sm:items-center gap-3.5">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-600 text-white shadow-2xs">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2h11zm2-10a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900">
+                                Equipment accountability & return reminders
+                            </h3>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-purple-200/80 px-2.5 py-0.5 text-[11px] font-bold text-purple-900">
+                                ● Sports Coordinator
+                            </span>
+                        </div>
+                        <p class="mt-0.5 text-xs text-slate-600">
+                            Keep track of active borrowers, returned gear, and registered members ({{ isset($users) ? $users->count() : 0 }} total users).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                    <a href="{{ route('admin.users.index') }}"
+                       class="inline-flex items-center justify-center rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition hover:bg-purple-700">
+                        Manage users
+                    </a>
+                    <a href="{{ route('equipment.index') }}"
+                       class="inline-flex items-center justify-center rounded-xl border border-purple-200 bg-white px-4 py-2.5 text-xs font-bold text-purple-900 transition hover:bg-purple-50">
+                        View equipment
+                    </a>
+                </div>
+            </section>
+
+            <!-- 4. Lower Two-Column Grid (Matching Left Table Card + Right Quick Actions / Status Card) -->
+            <div class="grid grid-cols-1 gap-5 lg:grid-cols-12">
+
+                <!-- Left (7 cols): Borrowing & Facility Weather Overview Card -->
+                <section class="lg:col-span-7 rounded-2xl border border-purple-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-4 border-b border-purple-100">
+                            <div>
+                                <h3 class="text-base font-extrabold text-slate-900">
+                                    Outdoor facility & weather status
+                                </h3>
+                                <p class="text-xs text-slate-500">
+                                    Real-time outdoor condition for PE and sports training
+                                </p>
+                            </div>
+                            <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold text-purple-700 hover:underline">
+                                Refresh
+                            </a>
+                        </div>
+
+                        @if(isset($errorMessage))
+                            <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800">
+                                <p class="text-xs font-bold">Weather Information Unavailable</p>
+                                <p class="mt-1 text-xs text-rose-600">{{ $errorMessage }}</p>
+                            </div>
+                        @elseif(isset($weatherData))
+                            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">Location</span>
+                                    <span class="mt-1 block text-sm font-extrabold uppercase text-slate-900 truncate">{{ $weatherData['city'] }}</span>
+                                </div>
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">Temperature</span>
+                                    <span class="mt-1 block text-sm font-extrabold text-slate-900">{{ $weatherData['temperature'] }} °C</span>
+                                </div>
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">Condition</span>
+                                    <span class="mt-1 block text-sm font-bold capitalize text-slate-900 truncate">{{ $weatherData['description'] }}</span>
+                                </div>
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">Humidity</span>
+                                    <span class="mt-1 block text-sm font-extrabold text-slate-900">{{ $weatherData['humidity'] }} %</span>
+                                </div>
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">Wind Speed</span>
+                                    <span class="mt-1 block text-sm font-extrabold text-slate-900">{{ $weatherData['wind_speed'] }} km/h</span>
+                                </div>
+                                <div class="rounded-xl border border-purple-100 bg-purple-50/50 p-3.5 flex flex-col justify-center">
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-700/70">API Status</span>
+                                    <span class="mt-1 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                        Connected
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t border-purple-100/80 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Synced via Laravel HTTP Client</span>
+                        <span>Sports & PE Department</span>
+                    </div>
+                </section>
+
+                <!-- Right (5 cols): Quick Actions Card (Matching Right Quick Actions Card) -->
+                <section class="lg:col-span-5 rounded-2xl border border-purple-200/80 bg-white p-6 shadow-2xs">
+                    <h3 class="text-base font-extrabold text-slate-900">
+                        Quick actions
+                    </h3>
+                    <p class="mt-0.5 text-xs text-slate-500 mb-4">
+                        Jump straight to daily equipment & logbook tasks
+                    </p>
+
+                    <div class="space-y-3">
+                        <a href="{{ route('admin.borrowings.index') }}"
+                           class="flex items-center gap-3.5 rounded-xl border border-purple-100 bg-purple-50/40 p-3.5 transition hover:border-purple-300 hover:bg-purple-50">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700 font-bold text-sm">
+                                📋
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <span class="block text-sm font-bold text-slate-900">Manage borrowing logs</span>
+                                <span class="block text-xs text-slate-500">Check active borrows & confirm returns</span>
+                            </div>
+                            <span class="text-purple-400 font-bold">›</span>
+                        </a>
+
+                        <a href="{{ route('equipment.index') }}"
+                           class="flex items-center gap-3.5 rounded-xl border border-purple-100 bg-purple-50/40 p-3.5 transition hover:border-purple-300 hover:bg-purple-50">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700 font-bold text-sm">
+                                🏀
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <span class="block text-sm font-bold text-slate-900">Equipment inventory</span>
+                                <span class="block text-xs text-slate-500">View and update available sports items</span>
+                            </div>
+                            <span class="text-purple-400 font-bold">›</span>
+                        </a>
+
+                        <a href="{{ route('profile.edit') }}"
+                           class="flex items-center gap-3.5 rounded-xl border border-purple-100 bg-purple-50/40 p-3.5 transition hover:border-purple-300 hover:bg-purple-50">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700 font-bold text-sm">
+                                ⚙️
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <span class="block text-sm font-bold text-slate-900">Account settings</span>
+                                <span class="block text-xs text-slate-500">Update your profile & credentials</span>
+                            </div>
+                            <span class="text-purple-400 font-bold">›</span>
+                        </a>
+                    </div>
+                </section>
+
             </div>
 
         </div>
     </div>
-
 </x-app-layout>

@@ -1,577 +1,385 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>School Sports Equipment Borrowing Logbook System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    html, body {
-      min-height: 100vh;
-      width: 100%;
-      position: relative;
-      overflow-x: hidden;
-      color: #f8fafc;
-      background-color: #0f172a;
-    }
-
-    /* Sharp Background Image Layer (No Blur) */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background-image: url("{{ asset('images/gym-bg.png') }}");
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      filter: none;
-      -webkit-filter: none;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-      image-rendering: -webkit-optimize-contrast;
-      pointer-events: none;
-    }
-
-    /* Navigation Bar */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      width: 100%;
-      padding: 16px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: rgba(15, 23, 42, 0.78);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.01em;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
-    }
-
-    .brand-badge {
-      background: linear-gradient(135deg, #2563eb, #0284c7);
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 13px;
-      padding: 7px 9px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: #e2e8f0;
-      font-size: 14px;
-      font-weight: 500;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: #ffffff;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-left: 8px;
-    }
-
-    .btn-login {
-      padding: 8px 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background-color: rgba(15, 23, 42, 0.55);
-      color: #ffffff !important;
-      font-weight: 600;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .btn-login:hover {
-      background-color: rgba(15, 23, 42, 0.8);
-      border-color: rgba(255, 255, 255, 0.55);
-    }
-
-    .btn-register {
-      padding: 8px 20px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #ffffff !important;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-register:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.65);
-    }
-
-    /* Main Hero Section */
-    .main-wrapper {
-      position: relative;
-      z-index: 10;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 24px;
-    }
-
-    .hero-card {
-      width: 100%;
-      max-width: 1120px;
-      background-color: rgba(15, 23, 42, 0.56);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 24px;
-      padding: 48px;
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 40px;
-      align-items: center;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Left Hero Content */
-    .pill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background-color: rgba(16, 185, 129, 0.22);
-      border: 1px solid rgba(110, 231, 183, 0.45);
-      color: #a7f3d0;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #10b981;
-    }
-
-    .hero-title {
-      font-size: 42px;
-      font-weight: 800;
-      line-height: 1.14;
-      letter-spacing: -0.025em;
-      color: #ffffff;
-      margin-bottom: 18px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-    }
-
-    .hero-subtitle {
-      font-size: 16px;
-      line-height: 1.6;
-      color: #f1f5f9;
-      margin-bottom: 30px;
-      max-width: 460px;
-      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75);
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #2563eb, #0284c7);
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.6);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px -5px rgba(37, 99, 235, 0.8);
-    }
-
-    .secondary-links {
-      margin-top: 18px;
-      font-size: 13.5px;
-      color: #e2e8f0;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
-    }
-
-    .secondary-links a {
-      color: #ffffff;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      font-weight: 600;
-      transition: color 0.2s ease;
-    }
-
-    .secondary-links a:hover {
-      color: #7dd3fc;
-    }
-
-    /* Right Dashboard Preview Widget */
-    .dashboard-preview {
-      background-color: rgba(30, 41, 59, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 20px;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1.05fr;
-      gap: 16px;
-    }
-
-    .inventory-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .inv-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background-color: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .inv-item:hover {
-      transform: translateX(3px);
-      border-color: rgba(255, 255, 255, 0.28);
-    }
-
-    .inv-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .badge-bb {
-      background-color: rgba(249, 115, 22, 0.22);
-      color: #fb923c;
-      border: 1px solid rgba(249, 115, 22, 0.4);
-    }
-
-    .badge-vb {
-      background-color: rgba(56, 189, 248, 0.22);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-    }
-
-    .badge-bd {
-      background-color: rgba(16, 185, 129, 0.22);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.4);
-    }
-
-    .badge-tg {
-      background-color: rgba(234, 179, 8, 0.22);
-      color: #facc15;
-      border: 1px solid rgba(234, 179, 8, 0.4);
-    }
-
-    .inv-info h4 {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 2px;
-    }
-
-    .status-available {
-      font-size: 12px;
-      font-weight: 600;
-      color: #34d399;
-    }
-
-    .status-borrowed {
-      font-size: 12px;
-      font-weight: 600;
-      color: #fbbf24;
-    }
-
-    /* Logbook Panel */
-    .logbook-panel {
-      background-color: rgba(15, 23, 42, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .logbook-header {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      padding: 10px 14px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 14px;
-    }
-
-    .status-pill {
-      background-color: rgba(16, 185, 129, 0.28);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-    }
-
-    .logbook-subtitle {
-      font-size: 12px;
-      font-weight: 600;
-      color: #cbd5e1;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-    }
-
-    .log-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 4px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 13px;
-      color: #f1f5f9;
-    }
-
-    .log-row:last-child {
-      border-bottom: none;
-    }
-
-    .check-icon {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .check-green {
-      background-color: rgba(16, 185, 129, 0.24);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.45);
-    }
-
-    .check-amber {
-      background-color: rgba(245, 158, 11, 0.24);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.45);
-    }
-
-    /* Footer Prompt */
-    .footer-prompt {
-      margin-top: 24px;
-      padding: 10px 22px;
-      border-radius: 999px;
-      background-color: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 14px;
-      color: #f8fafc;
-    }
-
-    .footer-prompt a {
-      color: #7dd3fc;
-      font-weight: 700;
-      text-decoration: none;
-      margin-left: 6px;
-    }
-
-    .footer-prompt a:hover {
-      text-decoration: underline;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 960px) {
-      .hero-card {
-        grid-template-columns: 1fr;
-        padding: 32px 24px;
-      }
-
-      .navbar {
-        padding: 14px 20px;
-      }
-
-      .hero-title {
-        font-size: 32px;
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
       }
     }
-
-    @media (max-width: 640px) {
-      .dashboard-preview {
-        grid-template-columns: 1fr;
-      }
-
-      .nav-links > a {
-        display: none;
-      }
-    }
-  </style>
+  </script>
 </head>
-<body>
+<body class="min-h-screen flex flex-col bg-white text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-950">
 
-  <!-- Background Layer -->
-  <div class="bg-layer" aria-hidden="true"></div>
+  <!-- Top Hero Wrapper (Soft Light Purple Gradient) -->
+  <div class="relative bg-gradient-to-br from-purple-700 via-violet-600 to-purple-500 text-white pt-4 pb-24 px-4 sm:px-6">
+    
+    <!-- Floating White Pill Navbar -->
+    <header class="sticky top-4 z-40 max-w-6xl mx-auto bg-white rounded-2xl px-6 py-3 flex items-center justify-between shadow-lg shadow-purple-950/15">
+      <a href="{{ url('/') }}" class="flex items-center gap-2.5 text-purple-900 font-extrabold text-base tracking-tight">
+        <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center text-sm font-extrabold">
+          SE
+        </span>
+        <span>SportsLog</span>
+      </a>
 
-  <!-- Top Navigation -->
-  <header class="navbar">
-    <a href="{{ url('/') }}" class="brand">
-      <span class="brand-badge">SE</span>
-      <span>School Sports Equipment Borrowing Logbook System</span>
-    </a>
-
-    <nav class="nav-links">
-      <a href="{{ url('/') }}" class="active">Home</a>
-      <a href="#gear">Sports Gear</a>
-      <a href="#help">Help</a>
-      <div class="nav-actions">
-        <a href="{{ route('login') }}" class="btn-login">Log in</a>
-        <a href="{{ route('register') }}" class="btn-register">Register</a>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Main Content -->
-  <main class="main-wrapper">
-    <section class="hero-card">
-      <!-- Left Side -->
-      <div>
-        <div class="pill-tag">
-          <span class="pill-dot"></span>
-          <span>Campus Sports Inventory & Logbook</span>
+      <nav class="flex items-center gap-7">
+        <div class="hidden md:flex items-center gap-7">
+          <a href="{{ url('/') }}" class="text-sm font-bold text-purple-700 border-b-2 border-purple-600 pb-0.5">
+            Home
+          </a>
+          <a href="#gear" class="text-sm font-medium text-slate-600 hover:text-purple-700 transition">
+            Sports Gear
+          </a>
+          <a href="#about" class="text-sm font-medium text-slate-600 hover:text-purple-700 transition">
+            About Us
+          </a>
+          <a href="#contact" class="text-sm font-medium text-slate-600 hover:text-purple-700 transition">
+            Contact Us
+          </a>
         </div>
 
-        <h1 class="hero-title">School Sports Equipment Borrowing Logbook System</h1>
+        <div class="flex items-center gap-2.5">
+          <a href="{{ route('login') }}" class="px-5 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 text-sm font-bold transition">
+            Log In
+          </a>
+          <a href="{{ route('register') }}" class="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold shadow-sm transition">
+            Register
+          </a>
+        </div>
+      </nav>
+    </header>
 
-        <p class="hero-subtitle">
-          Easily track, request, and borrow sports gear for your school activities
-        </p>
+    <!-- Centered Hero Content -->
+    <div class="max-w-3xl mx-auto text-center pt-16 pb-6 px-2">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 text-white text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-purple-200"></span>
+        <span>School Sports Equipment Logbook</span>
+      </div>
 
-        <a href="{{ route('login') }}" class="btn-primary">
-          <span>Borrow Sports Gear</span>
-          <span>›</span>
+      <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white mb-5">
+        Sports equipment borrowing, made simple
+      </h1>
+
+      <p class="text-base sm:text-lg leading-relaxed text-purple-100 max-w-2xl mx-auto mb-8 font-normal">
+        SportsLog connects students and coaches with the PE inventory and gives staff an easier way to track, approve, and manage borrowed gear.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="{{ route('login') }}" class="px-7 py-3 rounded-xl bg-white hover:bg-purple-50 text-purple-800 text-sm font-bold shadow-md transition hover:-translate-y-0.5">
+          Borrow Equipment
         </a>
+        <a href="#gear" class="px-7 py-3 rounded-xl bg-purple-900/35 hover:bg-purple-900/50 text-white border border-white/25 text-sm font-semibold transition">
+          View Available Gear
+        </a>
+      </div>
+    </div>
+  </div>
 
-        <p class="secondary-links">
-          Explore <a href="#equipment">Equipment</a> or <a href="#features">Learn More</a>
+  <!-- Main White Content Area -->
+  <main class="flex-1 bg-white px-6 pt-16 pb-32 space-y-24">
+    
+    <!-- Section 1: Available Inventory -->
+    <section class="max-w-5xl mx-auto" id="gear">
+      <div class="text-center mb-12">
+        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-bold mb-3">
+          Available Inventory
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Built for smooth PE & campus sports
+        </h2>
+        <p class="text-sm sm:text-base text-slate-500 mt-2 max-w-xl mx-auto">
+          Check real-time stock before heading to the sports office.
         </p>
       </div>
 
-      <!-- Right Side Preview -->
-      <div class="dashboard-preview">
-        <div class="inventory-list">
-          <div class="inv-item">
-            <div class="inv-badge badge-bb">BB</div>
-            <div class="inv-info">
-              <h4>Basketballs</h4>
-              <span class="status-available">Available</span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Item 1 -->
+        <div class="rounded-2xl bg-purple-50/60 border border-purple-100 p-6 hover:shadow-lg hover:shadow-purple-900/5 transition">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-extrabold text-sm">
+              BB
             </div>
+            <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-bold">
+              12 available
+            </span>
           </div>
-
-          <div class="inv-item">
-            <div class="inv-badge badge-vb">VB</div>
-            <div class="inv-info">
-              <h4>Volleyballs</h4>
-              <span class="status-available">Available</span>
-            </div>
-          </div>
-
-          <div class="inv-item">
-            <div class="inv-badge badge-bd">BD</div>
-            <div class="inv-info">
-              <h4>Badminton Set</h4>
-              <span class="status-borrowed">3 Borrowed</span>
-            </div>
-          </div>
-
-          <div class="inv-item">
-            <div class="inv-badge badge-tg">00</div>
-            <div class="inv-info">
-              <h4>Timer & Gear</h4>
-              <span class="status-available">Ready</span>
-            </div>
-          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Spalding Basketballs</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Indoor & outdoor standard balls ready for PE classes and varsity practice.
+          </p>
         </div>
 
-        <div class="logbook-panel">
-          <div class="logbook-header">
-            <span>‹ Borrow Log</span>
-            <span class="status-pill">Status</span>
+        <!-- Item 2 -->
+        <div class="rounded-2xl bg-purple-50/60 border border-purple-100 p-6 hover:shadow-lg hover:shadow-purple-900/5 transition">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-extrabold text-sm">
+              VB
+            </div>
+            <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-bold">
+              8 available
+            </span>
           </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Mikasa Volleyballs</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Official game-weight volleyballs stored in the gymnasium equipment room.
+          </p>
+        </div>
 
-          <div class="logbook-subtitle">Logbook</div>
-
-          <div class="log-row">
-            <span>Spalding Ball #02</span>
-            <span class="check-icon check-green">✓</span>
+        <!-- Item 3 -->
+        <div class="rounded-2xl bg-purple-50/60 border border-purple-100 p-6 hover:shadow-lg hover:shadow-purple-900/5 transition">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-fuchsia-100 text-fuchsia-700 flex items-center justify-center font-extrabold text-sm">
+              BD
+            </div>
+            <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 text-xs font-bold">
+              3 remaining
+            </span>
           </div>
-          <div class="log-row">
-            <span>Mikasa Volleyball</span>
-            <span class="check-icon check-green">✓</span>
-          </div>
-          <div class="log-row">
-            <span>Yonex Rackets</span>
-            <span class="check-icon check-amber">!</span>
-          </div>
-          <div class="log-row">
-            <span>Training Cones</span>
-            <span class="check-icon check-green">✓</span>
-          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Badminton Rackets & Net</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Pair of lightweight rackets with shuttlecock tube and portable net set.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Bottom Prompt -->
-    <div class="footer-prompt">
-      Already registered? <a href="{{ route('login') }}">Log in</a>
-    </div>
+    <!-- Section 2: About Us & Contact Us -->
+    <section class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch" id="about">
+      
+      <!-- About Us Card (7 columns) -->
+      <div class="lg:col-span-7 rounded-3xl bg-purple-50/70 border border-purple-100 p-8 sm:p-10 flex flex-col justify-between">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-bold mb-4">
+            About Us
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-4">
+            Modernizing how our school tracks sports gear
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600 leading-relaxed mb-4">
+            The <strong class="text-purple-900">School Sports Equipment Borrowing Logbook System</strong> was created to replace slow, handwritten logbooks with a fast, accurate, and organized digital platform.
+          </p>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Whether it's for daily Physical Education classes, varsity training, or campus intramurals, students and faculty can easily check equipment availability, submit borrowing requests, and ensure timely returns.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 pt-6 mt-6 border-t border-purple-200/60">
+          <div>
+            <span class="block text-xl font-extrabold text-purple-700">100%</span>
+            <span class="text-xs text-slate-500 font-medium">Digital Tracking</span>
+          </div>
+          <div>
+            <span class="block text-xl font-extrabold text-purple-700">Fast</span>
+            <span class="text-xs text-slate-500 font-medium">Request Approval</span>
+          </div>
+          <div>
+            <span class="block text-xl font-extrabold text-purple-700">Zero</span>
+            <span class="text-xs text-slate-500 font-medium">Lost Records</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Us Card (5 columns) -->
+      <div class="lg:col-span-5 rounded-3xl bg-white border border-purple-100 shadow-xl shadow-purple-900/5 p-8 sm:p-9 flex flex-col justify-between" id="contact">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-bold mb-4">
+            Contact Us
+          </span>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">
+            Need help or have questions?
+          </h3>
+          <p class="text-sm text-slate-500 mb-6">
+            Reach out directly through any of my official accounts below:
+          </p>
+
+          <div class="space-y-3.5">
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/bergelyn.hermo" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-100 transition group">
+              <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="block text-xs font-semibold text-slate-400">Facebook</span>
+                <span class="block text-sm font-bold text-slate-900 group-hover:text-purple-700 truncate">Bergelyn A. Hermo</span>
+              </div>
+              <span class="text-purple-400 group-hover:translate-x-0.5 transition">›</span>
+            </a>
+
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/bergelynhermo" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-100 transition group">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="block text-xs font-semibold text-slate-400">Instagram</span>
+                <span class="block text-sm font-bold text-slate-900 group-hover:text-purple-700 truncate">@bergelynhermo</span>
+              </div>
+              <span class="text-purple-400 group-hover:translate-x-0.5 transition">›</span>
+            </a>
+
+            <!-- Gmail -->
+            <a href="mailto:hermobergelyn0@gmail.com" class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-100 transition group">
+              <div class="w-10 h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="block text-xs font-semibold text-slate-400">Gmail</span>
+                <span class="block text-sm font-bold text-slate-900 group-hover:text-purple-700 truncate">hermobergelyn0@gmail.com</span>
+              </div>
+              <span class="text-purple-400 group-hover:translate-x-0.5 transition">›</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </main>
+
+  <!-- Bottom CTA Banner & Light Purple Footer -->
+  <footer class="relative bg-purple-50 px-6 pt-12 pb-8 border-t border-purple-100">
+    
+    <!-- Floating CTA Banner -->
+    <div class="relative z-20 max-w-5xl mx-auto -mt-24 mb-12 bg-gradient-to-r from-purple-600 to-violet-600 rounded-2xl p-7 sm:px-9 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl shadow-purple-900/15">
+      <div>
+        <h3 class="text-xl sm:text-2xl font-extrabold text-white mb-1">
+          Borrow sports gear. Return on time.
+        </h3>
+        <p class="text-sm text-purple-100">
+          Digital logbook system built for students, coaches, and PE instructors.
+        </p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="{{ route('login') }}" class="px-5 py-2.5 rounded-xl bg-white hover:bg-purple-50 text-purple-800 text-sm font-bold transition shadow-sm">
+          Log In
+        </a>
+        <a href="{{ route('register') }}" class="px-5 py-2.5 rounded-xl bg-purple-900/35 hover:bg-purple-900/50 text-white border border-white/25 text-sm font-bold transition">
+          Create Account
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer Links Grid -->
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 pb-8 border-b border-purple-200/70">
+      <div class="md:col-span-5">
+        <a href="{{ url('/') }}" class="flex items-center gap-2.5 text-purple-950 font-extrabold text-base tracking-tight">
+          <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 text-white flex items-center justify-center text-sm font-extrabold">
+            SE
+          </span>
+          <span>School Sports Equipment Borrowing Logbook</span>
+        </a>
+        <p class="mt-3 text-sm leading-relaxed text-slate-600 max-w-sm">
+          A web-based logbook platform that helps students and school staff easily track, borrow, and manage sports equipment.
+        </p>
+      </div>
+
+      <div class="md:col-span-3">
+        <h5 class="text-xs font-bold uppercase tracking-wider text-purple-900/60 mb-3.5">Navigation</h5>
+        <ul class="space-y-2.5 text-sm text-slate-600">
+          <li><a href="{{ url('/') }}" class="hover:text-purple-700 hover:underline">Home</a></li>
+          <li><a href="#gear" class="hover:text-purple-700 hover:underline">Sports Gear</a></li>
+          <li><a href="#about" class="hover:text-purple-700 hover:underline">About Us</a></li>
+          <li><a href="#contact" class="hover:text-purple-700 hover:underline">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-4">
+        <h5 class="text-xs font-bold uppercase tracking-wider text-purple-900/60 mb-3.5">Connect With Us</h5>
+        <ul class="space-y-2.5 text-sm text-slate-600">
+          <li>
+            <a href="https://www.facebook.com/bergelyn.hermo" target="_blank" rel="noopener noreferrer" class="hover:text-purple-700 hover:underline">
+              Facebook: Bergelyn A. Hermo
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/bergelynhermo" target="_blank" rel="noopener noreferrer" class="hover:text-purple-700 hover:underline">
+              Instagram: @bergelynhermo
+            </a>
+          </li>
+          <li>
+            <a href="mailto:hermobergelyn0@gmail.com" class="hover:text-purple-700 hover:underline">
+              Gmail: hermobergelyn0@gmail.com
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright & Legal Links -->
+    <div class="max-w-5xl mx-auto pt-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
+      <span>© 2026 School Sports Equipment Borrowing Logbook System. All rights reserved.</span>
+      <div class="flex items-center gap-5">
+        <button type="button" onclick="openModal('privacyModal')" class="hover:text-purple-700 hover:underline font-medium">Privacy Policy</button>
+        <button type="button" onclick="openModal('termsModal')" class="hover:text-purple-700 hover:underline font-medium">Terms & Conditions</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacyModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-purple-100">
+      <div class="flex items-center justify-between border-b border-purple-100 pb-3 mb-4">
+        <h3 class="text-lg font-extrabold text-purple-950">Privacy Policy</h3>
+        <button type="button" onclick="closeModal('privacyModal')" class="text-slate-400 hover:text-purple-700 font-bold text-xl leading-none">×</button>
+      </div>
+      <div class="space-y-3 text-sm text-slate-600 leading-relaxed max-h-80 overflow-y-auto pr-1">
+        <p><strong class="text-slate-800">1. Information We Collect:</strong> We collect your name, email, gender, phone number, student/employee ID, course and section or department, and borrowing history for school sports inventory tracking.</p>
+        <p><strong class="text-slate-800">2. How We Use Information:</strong> Your details are used to verify equipment requests, record borrow/return timestamps, and notify you of overdue items.</p>
+        <p><strong class="text-slate-800">3. Data Protection:</strong> All logbook records are kept confidential within the School Sports Office and PE Department and are never shared outside the institution.</p>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="button" onclick="closeModal('privacyModal')" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold transition">
+          I Understand
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms & Conditions Modal -->
+  <div id="termsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-purple-100">
+      <div class="flex items-center justify-between border-b border-purple-100 pb-3 mb-4">
+        <h3 class="text-lg font-extrabold text-purple-950">Terms & Conditions</h3>
+        <button type="button" onclick="closeModal('termsModal')" class="text-slate-400 hover:text-purple-700 font-bold text-xl leading-none">×</button>
+      </div>
+      <div class="space-y-3 text-sm text-slate-600 leading-relaxed max-h-80 overflow-y-auto pr-1">
+        <p><strong class="text-slate-800">1. Eligibility:</strong> Only enrolled students, faculty members, and authorized coaches with a valid school account may borrow sports equipment.</p>
+        <p><strong class="text-slate-800">2. Care & Responsibility:</strong> Borrowers are responsible for inspecting items upon pickup and returning them in good condition within the scheduled PE period or intramural session.</p>
+        <p><strong class="text-slate-800">3. Lost or Damaged Gear:</strong> Any intentional damage or unreturned equipment must be reported immediately to the PE Department and may be subject to replacement rules.</p>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="button" onclick="closeModal('termsModal')" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold transition">
+          Agree & Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  </script>
 
 </body>
 </html>

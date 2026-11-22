@@ -16,7 +16,7 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -26,6 +26,18 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'gender' => ['nullable', Rule::in(['male', 'female'])],
+            'phone' => ['nullable', 'string', 'max:30'],
         ];
+
+        $role = strtolower(trim($this->user()->role));
+
+        if ($role === 'student') {
+            $rules['course_section'] = ['nullable', 'string', 'max:80'];
+        } elseif (in_array($role, ['staff', 'pe_instructor', 'pe instructor'], true)) {
+            $rules['department'] = ['nullable', 'string', 'max:120'];
+        }
+
+        return $rules;
     }
 }

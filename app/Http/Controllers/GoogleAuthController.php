@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Hash; // <--- Idinagdag dito
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
@@ -31,28 +30,31 @@ class GoogleAuthController extends Controller
 
             // 1. Hanapin muna ang user sa database gamit ang google_id O email
             $user = User::where('google_id', $googleUser->id)
-                        ->orWhere('email', $googleUser->email)
-                        ->first();
+                ->orWhere('email', $googleUser->email)
+                ->first();
 
             // 2. KUNG WALA PA SA DATABASE (O nabura): Awtomatikong gagawa ng bagong account
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'password' => Hash::make(uniqid()), // Random password dahil nag-google login sila
-                    'role' => 'staff', // I-set sa default role (hal. student o user)
+                    'role' => '',
                 ]);
             }
 
-
             // 3. Kung may nahanap na account pero wala pang nakakabit na google_id, i-update na natin ang google_id nito
-            if (!$user->google_id) {
+            if (! $user->google_id) {
                 $user->update(['google_id' => $googleUser->id]);
             }
 
             // 4. I-login ang user sa session
             Auth::login($user);
+
+            if (blank($user->role)) {
+                return redirect()->route('role.select');
+            }
 
             // 5. Suriin ang role para mailagay sa tamang dashboard
             $userRole = strtolower($user->role ?? '');
@@ -61,6 +63,7 @@ class GoogleAuthController extends Controller
                 if (Route::has('admin.dashboard')) {
                     return redirect()->route('admin.dashboard')->with('success', 'Welcome Admin!');
                 }
+
                 return redirect('/admin/dashboard')->with('success', 'Welcome Admin!');
             }
 
@@ -72,7 +75,7 @@ class GoogleAuthController extends Controller
             return redirect('/dashboard')->with('success', 'Successfully logged in with Google!');
 
         } catch (Exception $e) {
-            return redirect()->route('login')->with('error', 'Failed to authenticate with Google. Please try again. Error: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', 'Failed to authenticate with Google. Please try again. Error: '.$e->getMessage());
         }
     }
 }

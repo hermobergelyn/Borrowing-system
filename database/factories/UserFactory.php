@@ -30,7 +30,32 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'student',
+            'gender' => fake()->randomElement(['female', 'male']),
+            'phone' => fake()->numerify('09#########'),
+            'course_section' => 'BSIT 1A',
+            'profile_completed_at' => now(),
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $role = strtolower(trim($user->role));
+            $identifierField = match ($role) {
+                'student' => 'student_id',
+                'staff', 'pe_instructor', 'pe instructor', 'admin', 'administrator', 'sports coordinator' => 'employee_id',
+                default => null,
+            };
+
+            if ($identifierField !== null && blank($user->{$identifierField})) {
+                $identifierPrefix = $identifierField === 'student_id' ? 'STU' : 'EMP';
+
+                $user->forceFill([
+                    $identifierField => sprintf('%s-%06d', $identifierPrefix, $user->getKey()),
+                ])->save();
+            }
+        });
     }
 
     /**

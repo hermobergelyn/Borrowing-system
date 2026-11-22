@@ -47,6 +47,49 @@
             @endif
         </div>
 
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+                <x-input-label for="gender" :value="__('Gender')" />
+                <select id="gender" name="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Select gender</option>
+                    <option value="female" @selected(old('gender', $user->gender) === 'female')>Female</option>
+                    <option value="male" @selected(old('gender', $user->gender) === 'male')>Male</option>
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('gender')" />
+            </div>
+
+            <div>
+                <x-input-label for="phone" :value="__('Phone Number')" />
+                <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full" :value="old('phone', $user->phone)" autocomplete="tel" />
+                <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+            </div>
+        </div>
+
+        @if ($user->student_id || $user->employee_id)
+            <div class="rounded-lg border border-purple-100 bg-purple-50/50 p-4">
+                <div class="text-sm font-medium text-gray-600">
+                    {{ $user->student_id ? __('Student ID') : __('Employee ID') }} <span class="text-xs">({{ __('read-only') }})</span>
+                </div>
+                <div class="mt-1 font-mono text-base font-semibold text-purple-950">
+                    {{ $user->student_id ?? $user->employee_id }}
+                </div>
+            </div>
+        @endif
+
+        @if (strtolower(trim($user->role)) === 'student')
+            <div>
+                <x-input-label for="course_section" :value="__('Course & Section')" />
+                <x-text-input id="course_section" name="course_section" type="text" class="mt-1 block w-full" :value="old('course_section', $user->course_section)" />
+                <x-input-error class="mt-2" :messages="$errors->get('course_section')" />
+            </div>
+        @elseif (in_array(strtolower(trim($user->role)), ['staff', 'pe_instructor', 'pe instructor'], true))
+            <div>
+                <x-input-label for="department" :value="__('Department / Assigned Classes')" />
+                <x-text-input id="department" name="department" type="text" class="mt-1 block w-full" :value="old('department', $user->department)" />
+                <x-input-error class="mt-2" :messages="$errors->get('department')" />
+            </div>
+        @endif
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,35 +13,53 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 1. Create Default Users
-        User::updateOrCreate(
-            ['email' => 'admin@school.com'],
+        $defaultUsers = [
             [
+                'email' => 'admin@school.com',
                 'name' => 'Sports Coordinator Admin',
-                'password' => Hash::make('password123'),
                 'role' => 'admin',
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'staff@school.com'],
+            ],
             [
+                'email' => 'staff@school.com',
                 'name' => 'PE Instructor Staff',
-                'password' => Hash::make('password123'),
                 'role' => 'staff',
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'student@school.com'],
+            ],
             [
+                'email' => 'student@school.com',
                 'name' => 'Student Test',
-                'password' => Hash::make('password123'),
                 'role' => 'student',
-            ]
-        );
+            ],
+        ];
+        $passwordHash = Hash::make('password123');
 
-        // 2. Call EquipmentSeeder
+        foreach ($defaultUsers as $attributes) {
+            $user = User::firstOrCreate(
+                ['email' => $attributes['email']],
+                [
+                    'name' => $attributes['name'],
+                    'password' => $passwordHash,
+                    'role' => $attributes['role'],
+                    'gender' => null,
+                    'phone' => null,
+                ]
+            );
+
+            $identifierField = $attributes['role'] === 'student' ? 'student_id' : 'employee_id';
+            $identifierPrefix = $attributes['role'] === 'student' ? 'STU' : 'EMP';
+
+            $user->forceFill([
+                'name' => $attributes['name'],
+                'password' => $passwordHash,
+                'role' => $attributes['role'],
+                'profile_completed_at' => $user->profile_completed_at ?? now(),
+                $identifierField => filled($user->{$identifierField})
+                    ? $user->{$identifierField}
+                    : sprintf('%s-%06d', $identifierPrefix, $user->getKey()),
+                'gender' => $user->gender,
+                'phone' => $user->phone,
+            ])->save();
+        }
+
         $this->call([
             EquipmentSeeder::class,
         ]);

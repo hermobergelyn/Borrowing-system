@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -19,38 +19,40 @@ class AdminController extends Controller
 
         try {
             $apiUrl = config('services.weather.url', 'https://api.openweathermap.org/data/2.5/weather');
-            $city = config('services.weather.city', 'Arakan');
+            $city = trim((string) config('services.weather.city', 'Arakan'));
             $apiKey = config('services.weather.key');
 
             if (empty($apiKey)) {
-                throw new \Exception("Missing API Key in configuration or .env file.");
+                throw new \Exception('Missing API Key in configuration or .env file.');
             }
+
+            $cityName = $city !== '' ? explode(',', $city)[0] : 'Arakan';
 
             // Ginamit ang 'Arakan,PH' para masigurong mahanap ng OpenWeatherMap ang tamang siyudad sa Pilipinas
             $response = Http::timeout(5)->withoutVerifying()->get($apiUrl, [
-                'q' => $city . ',PH', 
+                'q' => $cityName.',PH',
                 'appid' => $apiKey,
                 'units' => 'metric',
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 $weatherData = [
-                    'city'        => $data['name'] ?? $city,
+                    'city' => $data['name'] ?? $cityName,
                     'temperature' => $data['main']['temp'] ?? 0,
                     'description' => ucfirst($data['weather'][0]['description'] ?? 'N/A'),
-                    'humidity'    => $data['main']['humidity'] ?? 0,
-                    'wind_speed'  => isset($data['wind']['speed']) ? round($data['wind']['speed'] * 3.6, 1) : 0,
+                    'humidity' => $data['main']['humidity'] ?? 0,
+                    'wind_speed' => isset($data['wind']['speed']) ? round($data['wind']['speed'] * 3.6, 1) : 0,
                 ];
             } else {
                 $errorBody = $response->json();
-                $errorMessage = 'API Error: ' . ($errorBody['message'] ?? 'Failed to retrieve weather data.') . ' (Code: ' . $response->status() . ')';
+                $errorMessage = 'API Error: '.($errorBody['message'] ?? 'Failed to retrieve weather data.').' (Code: '.$response->status().')';
             }
         } catch (ConnectionException $e) {
             $errorMessage = 'Connection timeout: The weather service is currently unreachable.';
         } catch (\Exception $e) {
-            $errorMessage = 'Error: ' . $e->getMessage();
+            $errorMessage = 'Error: '.$e->getMessage();
         }
 
         return view('admin.dashboard', compact('users', 'weatherData', 'errorMessage'));
@@ -78,7 +80,7 @@ class AdminController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
@@ -87,11 +89,11 @@ class AdminController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
-        
-        if($request->filled('password')) {
+
+        if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-        
+
         $user->role = $request->role;
         $user->save();
 
